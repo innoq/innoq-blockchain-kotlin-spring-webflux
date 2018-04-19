@@ -2,17 +2,13 @@ package com.innoq.event.blockchainktwebflux.domain
 
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.SynchronousSink
-import java.util.concurrent.Callable
-import java.util.concurrent.atomic.AtomicLong
-import java.util.function.BiFunction
+import java.util.stream.Stream
+
 
 class Miner {
     fun nextBlock(chain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
-        val proofGenerator = Flux.generate<Long, AtomicLong>(Callable { AtomicLong() }, BiFunction { state, sink ->
-            sink.next(state.getAndIncrement())
-            state
-        })
+
+        val proofGenerator = Flux.fromStream(Stream.iterate(0L) { i -> i + 1 })
 
         val candidateGenerator = chain.latestBlock()
                 .map { it.newCandidate(timestamp) }
