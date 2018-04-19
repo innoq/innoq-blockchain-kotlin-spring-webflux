@@ -1,5 +1,6 @@
 package com.innoq.event.blockchainktwebflux.domain
 
+import com.innoq.event.blockchainktwebflux.genesisBlock
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

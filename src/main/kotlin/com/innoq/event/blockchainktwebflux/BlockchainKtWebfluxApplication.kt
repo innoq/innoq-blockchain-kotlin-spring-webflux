@@ -1,7 +1,6 @@
 package com.innoq.event.blockchainktwebflux
 
-import com.innoq.event.blockchainktwebflux.domain.BlockChain
-import com.innoq.event.blockchainktwebflux.domain.genesisBlock
+import com.innoq.event.blockchainktwebflux.domain.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.support.beans
@@ -10,6 +9,11 @@ import org.springframework.web.reactive.function.server.router
 import java.util.*
 
 data class NodeInfo(val id: String = UUID.randomUUID().toString())
+
+
+fun genesisBlock(): Block {
+    return Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, "I am Heribert Innoq")), "0")
+}
 
 
 class Router(
@@ -34,6 +38,7 @@ fun beans() = beans {
     bean<NodeInfoHandler>()
     bean<BlocksHandler>()
     bean<MiningHandler>()
+    bean<JacksonBlockModule>()
 
     bean {
         Router(ref(), ref(), ref()).router()
