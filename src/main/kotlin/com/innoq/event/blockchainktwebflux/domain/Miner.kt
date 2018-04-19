@@ -4,32 +4,24 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.SynchronousSink
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicLong
 import java.util.function.BiFunction
 
 class Miner {
+    fun nextBlock(chain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
+        val proofGenerator = Flux.generate<Long, AtomicLong>(Callable { AtomicLong() }, BiFunction { state, sink ->
+            sink.next(state.getAndIncrement())
+            state
+        })
 
-    fun nextBlock(blockChain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
-        return Flux.from(blockChain.latestBlock())
-                .flatMap { latestBlock -> Flux.generate(stateSupplier(), blockCandidateGenerator(latestBlock, timestamp)) }
-                .skipUntil { blockCandidate -> blockCandidate.isValid() }
+        val candidateGenerator = chain.latestBlock()
+                .map { it.newCandidate(timestamp) }
+                .flatMapMany({ b -> Flux.generate<Block> { it.next(b) } })
+
+        return candidateGenerator
+                .zipWith(proofGenerator)
+                .map { it.t1.copy(proof = it.t2) }
+                .skipUntil { it.isValid() }
                 .next()
     }
-
-    private fun stateSupplier() = Callable<Long> { 0 }
-
-    private fun blockCandidateGenerator(latestBlock: Block, timestamp: Long): BiFunction<Long, SynchronousSink<Block>, Long> {
-        return BiFunction { state, sink ->
-            val blockCandidate = latestBlock.copy(
-                    index = latestBlock.index + 1,
-                    timestamp = timestamp,
-                    proof = state,
-                    transactions = emptyList(),
-                    previousBlockHash = latestBlock.hash()
-            )
-            sink.next(blockCandidate)
-
-            state.plus(1L)
-        }
-    }
-
 }

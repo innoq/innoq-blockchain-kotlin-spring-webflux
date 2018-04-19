@@ -20,6 +20,13 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
         return hash().startsWith("000");
     }
 
+    fun newCandidate(newTimestamp: Long): Block = this.copy(
+            index = this.index + 1,
+            timestamp = newTimestamp,
+            transactions = emptyList(),
+            previousBlockHash = this.hash()
+    )
+
     private fun encode(bytes: ByteArray): String {
 
         val rv = StringBuilder()
