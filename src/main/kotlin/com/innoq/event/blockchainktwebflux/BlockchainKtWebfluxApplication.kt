@@ -4,7 +4,6 @@ import com.innoq.event.blockchainktwebflux.domain.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.support.beans
-import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.router
 
 
@@ -12,18 +11,15 @@ fun genesisBlock(): Block {
     return Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, "I am Heribert Innoq")), "0")
 }
 
-
 class Router(
         val nodeInfoHandler: NodeInfoHandler,
         val blocksHandler: BlocksHandler,
         val miningHandler: MiningHandler
 ) {
-    fun router() = router() {
-        accept(MediaType.APPLICATION_JSON).nest {
-                GET("/", nodeInfoHandler::index)
-                GET("/blocks", blocksHandler::showBlocks)
-                GET("/mine", miningHandler::mine)
-        }
+    fun router() = router {
+        GET("/", nodeInfoHandler::index)
+        GET("/blocks", blocksHandler::showBlocks)
+        GET("/mine", miningHandler::mine)
     }
 
 }
