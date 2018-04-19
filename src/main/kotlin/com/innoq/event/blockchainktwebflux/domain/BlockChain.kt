@@ -4,14 +4,18 @@ import reactor.core.publisher.Mono
 
 class BlockChain(genesisBlock: Block) {
 
-    val blocks: List<Block>
+    val blocks: MutableList<Block>
 
     init {
-        blocks = listOf(genesisBlock)
+        blocks = mutableListOf(genesisBlock)
     }
 
     fun latestBlock(): Mono<Block> {
         return Mono.just(blocks.last())
+    }
+
+    fun add(nextBlock: Block) {
+        blocks.add(nextBlock)
     }
 
 }

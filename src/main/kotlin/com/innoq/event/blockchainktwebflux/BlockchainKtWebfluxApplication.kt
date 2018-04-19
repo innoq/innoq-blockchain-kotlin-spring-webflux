@@ -1,6 +1,7 @@
 package com.innoq.event.blockchainktwebflux
 
 import com.innoq.event.blockchainktwebflux.domain.BlockChain
+import com.innoq.event.blockchainktwebflux.domain.Miner
 import com.innoq.event.blockchainktwebflux.domain.genesisBlock
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -43,6 +44,8 @@ fun beans() = beans {
     bean {
         BlockChain(genesisBlock())
     }
+    bean<Miner>()
+
 }
 
 fun main(args: Array<String>) {

@@ -8,7 +8,7 @@ import java.util.function.BiFunction
 
 class Miner {
 
-    fun nextBlock(blockChain: BlockChain, timestamp: Long): Mono<Block> {
+    fun nextBlock(blockChain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
         return Flux.from(blockChain.latestBlock())
                 .flatMap { latestBlock -> Flux.generate(stateSupplier(), blockCandidateGenerator(latestBlock, timestamp)) }
                 .skipUntil { blockCandidate -> blockCandidate.hash().startsWith("000") }
