@@ -11,7 +11,7 @@ class Miner {
     fun nextBlock(blockChain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
         return Flux.from(blockChain.latestBlock())
                 .flatMap { latestBlock -> Flux.generate(stateSupplier(), blockCandidateGenerator(latestBlock, timestamp)) }
-                .skipUntil { blockCandidate -> blockCandidate.hash().startsWith("000") }
+                .skipUntil { blockCandidate -> blockCandidate.isValid() }
                 .next()
     }
 
