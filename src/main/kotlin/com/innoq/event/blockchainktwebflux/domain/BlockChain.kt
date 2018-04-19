@@ -1,6 +1,6 @@
 package com.innoq.event.blockchainktwebflux.domain
 
-import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 
 class BlockChain(genesisBlock: Block) {
 
@@ -13,13 +13,13 @@ class BlockChain(genesisBlock: Block) {
     val blockHeight: Int
         get() = this.blocks.size
 
-    fun latestBlock(): Mono<Block> {
-        return Mono.just(blocks.last())
-    }
+    fun mine() =
+        Flux.generate<Block>{ sink -> sink.next(computeNextBlock()) }.doOnNext {blocks.add(it)}
 
-    fun add(nextBlock: Block) {
-        blocks.add(nextBlock)
-    }
-
+    internal fun computeNextBlock(timestamp: Long = System.currentTimeMillis()) =
+        generateSequence(0L) { it + 1 }
+                .map { blocks.last().newCandidate(timestamp, it) }
+                .dropWhile { it.isValid().not() }
+                .first()
 }
 
