@@ -4,11 +4,7 @@ import reactor.core.publisher.Flux
 
 class BlockChain(genesisBlock: Block) {
 
-    val blocks: MutableList<Block>
-
-    init {
-        blocks = mutableListOf(genesisBlock)
-    }
+    val blocks: MutableList<Block> = mutableListOf(genesisBlock)
 
     val blockHeight: Int
         get() = this.blocks.size
