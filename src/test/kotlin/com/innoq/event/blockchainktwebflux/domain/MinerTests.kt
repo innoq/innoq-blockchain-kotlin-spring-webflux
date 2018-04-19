@@ -11,11 +11,10 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockOnly_returnsNextBlock() {
         // arrange
-        val miner = Miner()
         val blockChain = BlockChain(genesisBlock())
 
         // act
-        val nextBlock = miner.nextBlock(blockChain, 1234).block()
+        val nextBlock = blockChain.computeNextBlock(1234)
 
         // assert
         assertEquals(Block(

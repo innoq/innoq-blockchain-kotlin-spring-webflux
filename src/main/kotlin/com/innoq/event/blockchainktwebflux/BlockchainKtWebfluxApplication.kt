@@ -41,8 +41,6 @@ fun beans() = beans {
     bean {
         BlockChain(genesisBlock())
     }
-    bean<Miner>()
-
 }
 
 fun main(args: Array<String>) {
