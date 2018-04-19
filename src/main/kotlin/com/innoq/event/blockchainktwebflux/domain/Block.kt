@@ -7,14 +7,12 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
 
     companion object {
         val objectMapper = ObjectMapper()
-        val messageDigest = MessageDigest.getInstance("SHA-256")!!
-
         init {
             objectMapper.registerModule(JacksonBlockModule())
         }
     }
 
-    fun hash(): String = objectMapper.writeValueAsBytes(this).let { messageDigest.digest(it) }.let { encode(it) }
+    fun hash(): String = objectMapper.writeValueAsBytes(this).let { MessageDigest.getInstance("SHA-256").digest(it) }.let { encode(it) }
 
     fun isValid() = hash().startsWith("0000")
 
