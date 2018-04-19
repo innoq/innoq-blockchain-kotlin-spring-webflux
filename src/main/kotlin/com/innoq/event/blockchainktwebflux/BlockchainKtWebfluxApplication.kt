@@ -1,6 +1,6 @@
 package com.innoq.event.blockchainktwebflux
 
-import com.innoq.event.blockchainktwebflux.domain.Chain
+import com.innoq.event.blockchainktwebflux.domain.BlockChain
 import com.innoq.event.blockchainktwebflux.domain.genesisBlock
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -41,7 +41,7 @@ fun beans() = beans {
 
     bean<NodeInfo>()
     bean {
-        Chain(genesisBlock())
+        BlockChain(genesisBlock())
     }
 }
 

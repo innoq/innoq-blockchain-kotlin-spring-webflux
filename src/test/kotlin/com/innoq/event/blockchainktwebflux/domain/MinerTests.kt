@@ -11,7 +11,7 @@ class MinerTests {
     fun nextBlock_blockChainWithGenesisBlockOnly_returnsNextBlock() {
         // arrange
         val miner = Miner()
-        val blockChain = BlockChain()
+        val blockChain = BlockChain(genesisBlock())
 
         // act
         val nextBlock = miner.nextBlock(blockChain, 1234).block()
