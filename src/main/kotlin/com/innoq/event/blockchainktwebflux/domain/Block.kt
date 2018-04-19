@@ -7,17 +7,28 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
 
     fun hash(): String {
         val messageDigest = MessageDigest.getInstance("SHA-256")
-        val digest = messageDigest.digest(asJson().toByteArray(UTF_8))
+        val digest = messageDigest.digest(asJson(this).toByteArray(UTF_8))
         val hash = toHex(digest)
 
         return hash
     }
 
-    private fun asJson(): String {
-        // TODO implement based on block state
-        return """
-            {"index":1,"timestamp":0,"proof":1917336,"transactions":[{"id":"b3c973e2-db05-4eb5-9668-3e81c7389a6d","timestamp":0,"payload":"I am Heribert Innoq"}],"previousBlockHash":"0"}
-        """.trimIndent()
+    private fun asJson(block: Block): String {
+        return "{" +
+                "\"index\":" + block.index + "," +
+                "\"timestamp\":" + block.timestamp + "," +
+                "\"proof\":" + block.proof+ "," +
+                "\"transactions\":[" + asJson(block.transactions)+ "]," +
+                "\"previousBlockHash\":\"" + block.previousBlockHash + "\"}";
+    }
+
+    private fun asJson(transactions: List<Transaction>): String {
+        return transactions.map { transaction -> "{" +
+                "\"id\":\"" + transaction.id + "\"," +
+                "\"timestamp\":" + transaction.timestamp + "," +
+                "\"payload\":\"" + transaction.payload+ "\"" +
+                "}"
+        }.joinToString(",")
     }
 
     private fun toHex(bytes: ByteArray): String {
