@@ -30,6 +30,8 @@ class BlockchainKtWebfluxApplication
 
 fun beans() = beans {
     bean<NodeInfoHandler>()
+    bean<BlocksHandler>()
+    bean<MiningHandler>()
 
     bean {
         Router(ref(), ref(), ref()).router()
