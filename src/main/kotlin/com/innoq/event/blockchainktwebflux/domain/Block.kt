@@ -16,6 +16,10 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
 
     fun hash(): String = objectMapper.writeValueAsBytes(this).let { messageDigest.digest(it) }.let { encode(it) }
 
+    fun isValid(): Boolean {
+        return hash().startsWith("000");
+    }
+
     private fun encode(bytes: ByteArray): String {
 
         val rv = StringBuilder()

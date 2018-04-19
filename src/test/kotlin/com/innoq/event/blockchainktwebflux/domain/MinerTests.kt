@@ -1,9 +1,9 @@
 package com.innoq.event.blockchainktwebflux.domain
 
 import com.innoq.event.blockchainktwebflux.genesisBlock
+import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertTrue
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 
 class MinerTests {
@@ -25,7 +25,8 @@ class MinerTests {
                 transactions = emptyList(),
                 previousBlockHash = genesisBlock().hash()
         ), nextBlock)
-        assertTrue(nextBlock!!.hash().startsWith("000"))
+        println(nextBlock!!.hash())
+        assertTrue(nextBlock.isValid())
     }
 
 }
