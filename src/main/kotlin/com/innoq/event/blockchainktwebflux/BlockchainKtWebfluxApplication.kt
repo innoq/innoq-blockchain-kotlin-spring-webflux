@@ -4,25 +4,22 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.support.beans
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.router
-import reactor.core.publisher.Mono
 import java.util.*
 
 data class NodeInfo(val id: String = UUID.randomUUID().toString())
 
-class NodeInfoHandler(val nodeInfo: NodeInfo) {
-    fun index(request: ServerRequest): Mono<ServerResponse>
-            = ok().body(Mono.just(nodeInfo))
-}
 
-class Router(val nodeInfoHandler: NodeInfoHandler) {
+class Router(
+        val nodeInfoHandler: NodeInfoHandler,
+        val blocksHandler: BlocksHandler,
+        val miningHandler: MiningHandler
+) {
     fun router() = router() {
         accept(MediaType.APPLICATION_JSON).nest {
                 GET("/", nodeInfoHandler::index)
+                GET("/blocks", blocksHandler::showBlocks)
+                GET("/mine", miningHandler::mine)
         }
     }
 
@@ -35,7 +32,7 @@ fun beans() = beans {
     bean<NodeInfoHandler>()
 
     bean {
-        Router(ref()).router()
+        Router(ref(), ref(), ref()).router()
     }
 
     bean<NodeInfo>()
