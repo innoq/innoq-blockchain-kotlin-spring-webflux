@@ -1,5 +1,6 @@
 package com.innoq.event.blockchainktwebflux
 
+import com.innoq.event.blockchainktwebflux.domain.NodeInfo
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body

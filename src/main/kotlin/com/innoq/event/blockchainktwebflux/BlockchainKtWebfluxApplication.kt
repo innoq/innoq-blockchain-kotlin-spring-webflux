@@ -6,9 +6,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.support.beans
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.router
-import java.util.*
-
-data class NodeInfo(val id: String = UUID.randomUUID().toString())
 
 
 fun genesisBlock(): Block {
