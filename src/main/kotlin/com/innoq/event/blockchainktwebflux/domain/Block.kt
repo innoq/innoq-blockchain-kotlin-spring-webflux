@@ -19,10 +19,10 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
     private fun encode(bytes: ByteArray): String {
 
         val rv = StringBuilder()
-            for (i in 0 until bytes.size) {
-                rv.append(Integer.toHexString((bytes.get(i).toInt() and 0xff) + 0x100).substring(1))
-            }
-            return rv.toString()
+        for (i in 0 until bytes.size) {
+            rv.append(Integer.toHexString((bytes.get(i).toInt() and 0xff) + 0x100).substring(1))
+        }
+        return rv.toString()
 
     }
 }

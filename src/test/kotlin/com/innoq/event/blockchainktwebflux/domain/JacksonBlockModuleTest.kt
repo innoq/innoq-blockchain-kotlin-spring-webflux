@@ -1,7 +1,6 @@
-package com.innoq.event.blockchainktwebflux.api
+package com.innoq.event.blockchainktwebflux.domain
 
-import com.innoq.event.blockchainktwebflux.domain.Block
-import com.innoq.event.blockchainktwebflux.domain.Transaction
+import com.innoq.event.blockchainktwebflux.genesisBlock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
 @JsonTest
-class BlockSerializerTest {
+class JacksonBlockModuleTest {
     @Autowired
     lateinit var jacksonTester: JacksonTester<Block>
 
@@ -22,9 +21,7 @@ class BlockSerializerTest {
             {"index":1,"timestamp":0,"proof":1917336,"transactions":[{"id":"b3c973e2-db05-4eb5-9668-3e81c7389a6d","timestamp":0,"payload":"I am Heribert Innoq"}],"previousBlockHash":"0"}
         """.trimIndent()
 
-        val block = Block(1, 0, 1917336, arrayListOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, "I am Heribert Innoq")), "0")
-
-        assertThat(jacksonTester.write(block))
+        assertThat(jacksonTester.write(genesisBlock()))
                 .isEqualToJson(expected)
     }
 }
