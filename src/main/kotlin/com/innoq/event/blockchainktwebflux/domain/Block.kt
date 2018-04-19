@@ -9,7 +9,7 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
             .map { Integer.toHexString((it.toInt() and 0xff) + 0x100).substring(1) }
             .reduce { a, b -> a + b }
 
-    private fun hash(): String = objectMapper
+    internal fun hash(): String = objectMapper
             .writeValueAsBytes(this)
             .let { MessageDigest.getInstance("SHA-256").digest(it) }
             .let { encode(it) }
