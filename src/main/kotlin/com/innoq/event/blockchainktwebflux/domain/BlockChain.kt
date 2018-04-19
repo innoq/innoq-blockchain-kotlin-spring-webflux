@@ -10,6 +10,9 @@ class BlockChain(genesisBlock: Block) {
         blocks = mutableListOf(genesisBlock)
     }
 
+    val blockHeight: Int
+        get() = this.blocks.size
+
     fun latestBlock(): Mono<Block> {
         return Mono.just(blocks.last())
     }
