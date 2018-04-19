@@ -4,11 +4,9 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.stream.Stream
 
-
 class Miner {
     fun nextBlock(chain: BlockChain, timestamp: Long = System.currentTimeMillis()): Mono<Block> {
-
-        val proofGenerator = Flux.fromStream(Stream.iterate(0L) { i -> i + 1 })
+        val proofGenerator = Flux.fromStream(Stream.iterate(0L, Long::inc))
 
         val candidateGenerator = chain.latestBlock()
                 .map { it.newCandidate(timestamp) }
