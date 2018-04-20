@@ -7,8 +7,7 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.ServerResponse.created
-import org.springframework.web.reactive.function.server.ServerResponse.ok
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.reactive.function.server.router
@@ -37,6 +36,10 @@ fun beans() = beans {
             GET("/mine", {
                 ok().contentType(MediaType.APPLICATION_STREAM_JSON)
                         .body(chain.mine())
+            })
+            GET("/transaction/{id}", {
+                val transaction = chain.findTransaction(it.pathVariable("id"))
+                if (transaction != null) ok().body(Mono.just(transaction)) else notFound().build()
             })
             POST("/transactions", {request ->
                 created(URI("/transactions/id"))
