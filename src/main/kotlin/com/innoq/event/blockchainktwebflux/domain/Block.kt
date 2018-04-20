@@ -5,9 +5,7 @@ import java.security.MessageDigest
 
 data class Block(val index: Long, val timestamp: Long, val proof: Long, val transactions: List<Transaction>, val previousBlockHash: String) {
 
-    private fun encode(bytes: ByteArray): String = bytes
-            .map { Integer.toHexString((it.toInt() and 0xff) + 0x100).substring(1) }
-            .reduce { a, b -> a + b }
+    private fun encode(bytes: ByteArray): String = bytes.fold("", { str, it -> str + "%02x".format(it) })
 
     internal fun hash(): String = objectMapper
             .writeValueAsBytes(this)
