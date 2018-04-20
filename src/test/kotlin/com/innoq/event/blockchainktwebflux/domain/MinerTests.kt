@@ -2,6 +2,8 @@ package com.innoq.event.blockchainktwebflux.domain
 
 import com.innoq.event.blockchainktwebflux.genesisBlock
 import org.junit.Test
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.util.function.component1
 import reactor.util.function.component2
 import java.time.Clock
@@ -54,11 +56,9 @@ class MinerTests {
         val eventPublisher = EventPublisher()
         val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
-        rangeClosed(1, 6).forEach { index ->
-            blockChain.queue(Payload("new transaction $index")).block()
-        }
-
-        blockChain.mine().zipWith(blockChain.mine())
+        Flux.range(1,6)
+                .flatMap { blockChain.queue(Payload("new transaction $it")) }
+                .then(Mono.defer { blockChain.mine().zipWith(blockChain.mine())})
                 .subscribe { t ->
                     val (firstNextBlock,secondNextBlock) = t
 
