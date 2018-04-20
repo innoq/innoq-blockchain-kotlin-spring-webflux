@@ -7,16 +7,21 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 import org.springframework.http.MediaType
+import org.springframework.web.reactive.function.server.ServerResponse.created
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.body
+import org.springframework.web.reactive.function.server.bodyToFlux
+import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.net.URI
 import java.time.Clock
+import java.util.*
 
 @SpringBootApplication
 class SimpleBlockChainApplication
 
-fun genesisBlock() = Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, "I am Heribert Innoq")), "0")
+fun genesisBlock() = Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, Payload("I am Heribert Innoq"))), "0")
 
 fun beans() = beans {
     val chain = BlockChain(genesisBlock(), Clock.systemUTC())
@@ -34,6 +39,10 @@ fun beans() = beans {
             GET("/mine", {
                 ok().contentType(MediaType.APPLICATION_STREAM_JSON)
                         .body(chain.mine())
+            })
+            POST("/transactions", {request ->
+                created(URI("/transactions/id"))
+                        .body(request.bodyToMono<Payload>().map { chain.queue(it) })
             })
         }
     }
