@@ -1,12 +1,12 @@
 package com.innoq.event.blockchainktwebflux.domain
 
 import com.innoq.event.blockchainktwebflux.genesisBlock
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import kotlin.test.junit.JUnitAsserter.assertEquals
+import kotlin.test.junit.JUnitAsserter.assertTrue
 
 class MinerTests {
 
@@ -19,15 +19,13 @@ class MinerTests {
         val nextBlock = blockChain.mine().block()
 
         // assert
-        assertEquals(Block(
+        assertEquals("Next block doesn't match", Block(
                 index = 2,
                 timestamp = 1234,
                 proof = 60229,
                 transactions = emptyList(),
                 previousBlockHash = genesisBlock().hash()
         ), nextBlock)
-        println(nextBlock!!.hash())
-        assertTrue(nextBlock.isValid())
+        assertTrue("Next block is not valid", nextBlock!!.isValid())
     }
-
 }
