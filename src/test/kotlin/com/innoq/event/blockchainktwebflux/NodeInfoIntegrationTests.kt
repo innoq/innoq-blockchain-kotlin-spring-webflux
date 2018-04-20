@@ -13,7 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class NodeInfo_IT {
+class NodeInfoIntegrationTests {
 
     @Autowired
     lateinit var webClient: WebTestClient
