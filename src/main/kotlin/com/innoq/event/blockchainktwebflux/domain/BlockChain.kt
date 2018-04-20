@@ -23,6 +23,10 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
         pendingTransaction
     }
 
+    fun findTransaction(transactionId: String): Mono<Transaction> =
+            Mono.justOrEmpty(blocks.flatMap { it.transactions }.firstOrNull { it.id == transactionId }
+                    ?: pendingTransactions.firstOrNull { it.id == transactionId })
+
     private fun computeNextBlock(): Block {
         val nextIndex = lastIndex.incrementAndGet()
         val timestamp = clock.millis()
@@ -40,8 +44,4 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
 
         return transactions
     }
-
-    fun findTransaction(transactionId: String): Mono<Transaction> =
-            Mono.justOrEmpty(blocks.flatMap { it.transactions }.firstOrNull { it.id == transactionId })
 }
-

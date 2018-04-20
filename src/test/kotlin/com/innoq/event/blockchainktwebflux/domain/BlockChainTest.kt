@@ -11,7 +11,7 @@ import kotlin.test.assertNull
 class BlockChainTest {
 
     @Test
-    fun looks_up_transaction_with_id() {
+    fun looks_up_confirmed_transaction_with_id() {
         // given
         val transactionId = "id"
 
@@ -35,6 +35,24 @@ class BlockChainTest {
 
         // then
         assertEquals(transaction2, returnedTransaction)
+    }
+
+    @Test
+    fun looks_up_pending_transaction_with_id() {
+        // given
+        val block1 = mockk<Block>()
+        every { block1.index } returns 1
+        every { block1.transactions } returns emptyList()
+        val blockChain = BlockChain(listOf(block1), Clock.systemDefaultZone())
+
+        blockChain.queue(Payload("other"))
+        val transaction = blockChain.queue(Payload("wanted")).block()!!
+
+        // when
+        val returnedTransaction = blockChain.findTransaction(transaction.id).block()
+
+        // then
+        assertEquals(transaction, returnedTransaction)
     }
 
     @Test
