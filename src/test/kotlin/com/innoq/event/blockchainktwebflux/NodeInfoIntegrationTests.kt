@@ -1,8 +1,7 @@
 package com.innoq.event.blockchainktwebflux
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.hamcrest.Matchers.isEmptyOrNullString
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +24,20 @@ class NodeInfoIntegrationTests {
                 .expectBody().returnResult().apply {
                     val json = ObjectMapper().readTree(responseBody)
                     assertThat(json.at("/id").textValue(), not(isEmptyOrNullString()))
+                }
+    }
+
+    @Test
+    fun returns_same_id_on_each_request() {
+        var idReturnedOn1stRequest: String = ""
+        webClient.get().uri("/").exchange().expectBody().returnResult().apply {
+            val json = ObjectMapper().readTree(responseBody)
+            idReturnedOn1stRequest = json.at("/id").textValue()
+        }
+        webClient.get().uri("/").exchange()
+                .expectBody().returnResult().apply {
+                    val json = ObjectMapper().readTree(responseBody)
+                    assertThat(json.at("/id").textValue(), equalTo(idReturnedOn1stRequest))
                 }
     }
 }
