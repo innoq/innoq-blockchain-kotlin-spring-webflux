@@ -5,10 +5,10 @@ import java.time.Clock
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
-class BlockChain(genesisBlock: Block, private val clock: Clock) {
+class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
 
-    private val blocks = mutableListOf(genesisBlock)
-    private val lastIndex = AtomicLong(genesisBlock.index)
+    private val blocks = mutableListOf(*initialBlocks.toTypedArray())
+    private val lastIndex = AtomicLong(initialBlocks.last().index)
     private val pendingTransactions = mutableListOf<Transaction>()
 
     val blockHeight: Int
@@ -42,5 +42,11 @@ class BlockChain(genesisBlock: Block, private val clock: Clock) {
 
         return transactions
     }
+
+    fun findTransaction(transactionId: String): Transaction? =
+            blocks.flatMap { it.transactions }
+                    .filter { it.id == transactionId }
+                    .firstOrNull()
+
 }
 

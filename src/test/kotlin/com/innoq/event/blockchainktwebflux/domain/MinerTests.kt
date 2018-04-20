@@ -14,7 +14,7 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockOnly_returnsNextBlock() {
         // arrange
-        val blockChain = BlockChain(genesisBlock(), fixedClock(1234))
+        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
 
         // act
         val nextBlock = blockChain.mine().block()
@@ -33,7 +33,7 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockAndLessThanFivePendingTransactions_returnsNextBlockWithAllPendingTransactions() {
         // arrange
-        val blockChain = BlockChain(genesisBlock(), fixedClock(1234))
+        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
 
         rangeClosed(1, 3).forEach { index ->
             blockChain.queue(Payload("new transaction $index"))
@@ -50,7 +50,7 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockAndMoreThanFivePendingTransactions_returnsNextBlockWithFivePendingTransactions() {
         // arrange
-        val blockChain = BlockChain(genesisBlock(), fixedClock(1234))
+        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
 
         rangeClosed(1, 6).forEach { index ->
             blockChain.queue(Payload("new transaction $index"))
