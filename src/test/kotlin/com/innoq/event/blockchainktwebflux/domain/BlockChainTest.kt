@@ -76,7 +76,7 @@ class BlockChainTest {
         val blockChain = BlockChain(listOf(block1, block2), eventPublisher, clock)
 
         // when
-        val returnedTransaction = blockChain.findTransaction(transactionId)
+        val returnedTransaction = blockChain.findTransaction(transactionId).block()
 
         // then
         assertNull(returnedTransaction)

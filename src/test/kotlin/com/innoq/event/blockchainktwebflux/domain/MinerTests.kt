@@ -2,6 +2,8 @@ package com.innoq.event.blockchainktwebflux.domain
 
 import com.innoq.event.blockchainktwebflux.genesisBlock
 import org.junit.Test
+import reactor.util.function.component1
+import reactor.util.function.component2
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -36,7 +38,7 @@ class MinerTests {
         val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
         rangeClosed(1, 3).forEach { index ->
-            blockChain.queue(Payload("new transaction $index"))
+            blockChain.queue(Payload("new transaction $index")).block()
         }
 
         // act
@@ -53,19 +55,19 @@ class MinerTests {
         val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
         rangeClosed(1, 6).forEach { index ->
-            blockChain.queue(Payload("new transaction $index"))
+            blockChain.queue(Payload("new transaction $index")).block()
         }
 
-        // act
-        val firstNextBlock = blockChain.mine().block()
-        val secondNextBlock = blockChain.mine().block()
+        blockChain.mine().zipWith(blockChain.mine())
+                .subscribe { t ->
+                    val (firstNextBlock,secondNextBlock) = t
 
-        // assert
-        assertEquals("First next block doesn't contain expected number of transactions", firstNextBlock!!.transactions.size, 5)
-        assertEquals("First next block doesn't contain expected transactions", Payload("new transaction 5"), transactionPayloadIn(firstNextBlock, 4))
+                    assertEquals("First next block doesn't contain expected number of transactions", firstNextBlock!!.transactions.size, 5)
+                    assertEquals("First next block doesn't contain expected transactions", Payload("new transaction 5"), transactionPayloadIn(firstNextBlock, 4))
 
-        assertEquals("Second next block doesn't contain expected number of transactions", secondNextBlock!!.transactions.size, 1)
-        assertEquals("Second next block doesn't contain expected transactions", Payload("new transaction 6"), transactionPayloadIn(secondNextBlock, 0))
+                    assertEquals("Second next block doesn't contain expected number of transactions", secondNextBlock!!.transactions.size, 1)
+                    assertEquals("Second next block doesn't contain expected transactions", Payload("new transaction 6"), transactionPayloadIn(secondNextBlock, 0))
+                }
     }
 
     private fun fixedClock(now: Long) = Clock.fixed(Instant.ofEpochMilli(now), ZoneId.of("UTC"))
