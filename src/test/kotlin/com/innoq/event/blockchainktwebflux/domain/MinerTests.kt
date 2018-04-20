@@ -61,8 +61,8 @@ class MinerTests {
 
         // assert
         assertEquals("Next block doesn't contain all pending transactions", nextBlock!!.transactions.size, 5)
-        assertEquals("Pending transaction is not one added last", blockChain.pendingTransactions().size, 1)
-        assertEquals("Pending transaction is not one added last", blockChain.pendingTransactions().first().payload, Payload("new transaction 6"))
+        assertEquals("Incorrect number of pending transactions after mining next block", blockChain.pendingTransactions().size, 1)
+        assertEquals("Pending transaction is not last one added", blockChain.pendingTransactions().first().payload, Payload("new transaction 6"))
     }
 
     private fun fixedClock(now: Long) = Clock.fixed(Instant.ofEpochMilli(now), ZoneId.of("UTC"))
