@@ -5,7 +5,7 @@ import java.time.Clock
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
-class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
+class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPublisher, private val clock: Clock) {
 
     private val blocks = mutableListOf(*initialBlocks.toTypedArray())
     private val lastIndex = AtomicLong(initialBlocks.last().index)
@@ -20,6 +20,7 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
     fun queue(payload: Payload) = Mono.fromSupplier {
         val pendingTransaction = Transaction(UUID.randomUUID().toString(), clock.millis(), payload)
         pendingTransactions.add(pendingTransaction)
+        eventPublisher.publishNewTransaction(pendingTransaction)
         pendingTransaction
     }
 

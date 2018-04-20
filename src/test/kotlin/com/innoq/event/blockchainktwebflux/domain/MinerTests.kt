@@ -14,7 +14,8 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockOnly_returnsNextBlock() {
         // arrange
-        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
+        val eventPublisher = EventPublisher()
+        val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
         // act
         val nextBlock = blockChain.mine().block()
@@ -33,7 +34,8 @@ class MinerTests {
     @Test
     fun nextBlock_blockChainWithGenesisBlockAndLessThanFivePendingTransactions_returnsNextBlockWithAllPendingTransactions() {
         // arrange
-        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
+        val eventPublisher = EventPublisher()
+        val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
         rangeClosed(1, 3).forEach { index ->
             blockChain.queue(Payload("new transaction $index"))
@@ -44,13 +46,13 @@ class MinerTests {
 
         // assert
         assertEquals("Next block doesn't contain all pending transactions", nextBlock!!.transactions.size, 3)
-
     }
 
     @Test
     fun nextBlock_blockChainWithGenesisBlockAndMoreThanFivePendingTransactions_returnsFirstNextBlockWithFivePendingTransactionsAndSecondNextBlockWithRemainingPendingtransactions() {
         // arrange
-        val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
+        val eventPublisher = EventPublisher()
+        val blockChain = BlockChain(listOf(genesisBlock()), eventPublisher, fixedClock(1234))
 
         rangeClosed(1, 6).forEach { index ->
             blockChain.queue(Payload("new transaction $index"))

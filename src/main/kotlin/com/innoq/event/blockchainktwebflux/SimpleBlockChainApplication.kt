@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_STREAM_JSON
 import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.bodyToMono
@@ -21,7 +21,8 @@ class SimpleBlockChainApplication
 fun genesisBlock() = Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, Payload("I am Heribert Innoq"))), "0")
 
 fun beans() = beans {
-    val chain = BlockChain(listOf(genesisBlock()), Clock.systemUTC())
+    val eventPublisher = EventPublisher()
+    val chain = BlockChain(listOf(genesisBlock()), eventPublisher, Clock.systemUTC())
     val nodeInfo = NodeInfo(chain)
 
     bean<JacksonBlockModule>()
@@ -34,7 +35,7 @@ fun beans() = beans {
                 ok().body(Mono.just(chain))
             })
             GET("/mine", {
-                ok().contentType(MediaType.APPLICATION_STREAM_JSON)
+                ok().contentType(APPLICATION_STREAM_JSON)
                         .body(chain.mine())
             })
             POST("/transactions", { request ->
@@ -51,6 +52,10 @@ fun beans() = beans {
                 chain.findTransaction(it.pathVariable("id"))
                         .flatMap { ok().body(Mono.just(it)) }
                         .switchIfEmpty(notFound().build())
+            })
+            GET("/events", {
+                ok().contentType(APPLICATION_STREAM_JSON)
+                        .body(eventPublisher.events())
             })
         }
     }

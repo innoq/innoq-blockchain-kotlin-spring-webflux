@@ -15,6 +15,7 @@ class BlockChainTest {
         // given
         val transactionId = "id"
 
+        val eventPublisher = mockk<EventPublisher>()
         val clock = mockk<Clock>()
         val block1 = mockk<Block>()
         every { block1.index } returns 1
@@ -28,7 +29,7 @@ class BlockChainTest {
         every { block2.index } returns 2
         every { block2.transactions } returns listOf(transaction1, transaction2)
 
-        val blockChain = BlockChain(listOf(block1, block2), clock)
+        val blockChain = BlockChain(listOf(block1, block2), eventPublisher, clock)
 
         // when
         val returnedTransaction = blockChain.findTransaction(transactionId).block()
@@ -40,10 +41,11 @@ class BlockChainTest {
     @Test
     fun looks_up_pending_transaction_with_id() {
         // given
+        val eventPublisher = mockk<EventPublisher>(relaxed = true)
         val block1 = mockk<Block>()
         every { block1.index } returns 1
         every { block1.transactions } returns emptyList()
-        val blockChain = BlockChain(listOf(block1), Clock.systemDefaultZone())
+        val blockChain = BlockChain(listOf(block1), eventPublisher, Clock.systemDefaultZone())
 
         blockChain.queue(Payload("other"))
         val transaction = blockChain.queue(Payload("wanted")).block()!!
@@ -60,6 +62,7 @@ class BlockChainTest {
         // given
         val transactionId = "id"
 
+        val eventPublisher = mockk<EventPublisher>()
         val clock = mockk<Clock>()
         val block1 = mockk<Block>()
         every { block1.index } returns 1
@@ -70,7 +73,7 @@ class BlockChainTest {
         every { transaction.id } returns "other"
         every { block2.index } returns 2
         every { block2.transactions } returns listOf(transaction)
-        val blockChain = BlockChain(listOf(block1, block2), clock)
+        val blockChain = BlockChain(listOf(block1, block2), eventPublisher, clock)
 
         // when
         val returnedTransaction = blockChain.findTransaction(transactionId)
