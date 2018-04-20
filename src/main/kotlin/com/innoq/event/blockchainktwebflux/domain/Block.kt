@@ -21,15 +21,15 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
 
     /**
      * Creates a new candidate from this block with based on a new timestampe and
-     * proposed proof.
+     * proposed proposedProof.
      */
-    fun newCandidate(newTimestamp: Long, proof: Long, transactions: List<Transaction> = emptyList()) = this
+    fun newCandidate(nextIndex: Long, newTimestamp: Long, proposedProof: Long, transactions: List<Transaction> = emptyList()) = this
             .copy(
-                    index = this.index + 1,
+                    index = nextIndex,
                     timestamp = newTimestamp,
                     transactions = transactions,
                     previousBlockHash = this.hash(),
-                    proof = proof
+                    proof = proposedProof
             )
 
     companion object {
