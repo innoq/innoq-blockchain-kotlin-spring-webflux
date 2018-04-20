@@ -1,10 +1,10 @@
 package com.innoq.event.blockchainktwebflux.domain
 
-import reactor.core.publisher.Flux
-import java.util.concurrent.atomic.AtomicInteger
+import reactor.core.publisher.Mono
+import java.time.Clock
 import java.util.concurrent.atomic.AtomicLong
 
-class BlockChain(genesisBlock: Block) {
+class BlockChain(genesisBlock: Block, private val clock: Clock) {
 
     val blocks = mutableListOf(genesisBlock)
     val lastIndex = AtomicLong(genesisBlock.index)
@@ -13,10 +13,12 @@ class BlockChain(genesisBlock: Block) {
         get() = this.blocks.size
 
     fun mine() =
-        Flux.generate<Block>{ sink -> sink.next(computeNextBlock()) }.doOnNext {blocks.add(it)}
+        Mono.just(computeNextBlock()).doOnNext {blocks.add(it)}
 
-    internal fun computeNextBlock(timestamp: Long = System.currentTimeMillis()) : Block {
+    private fun computeNextBlock() : Block {
         val nextIndex = lastIndex.incrementAndGet()
+        val timestamp = clock.millis()
+
         return generateSequence(0L) { it + 1 }
                 .map { blocks.last().newCandidate(nextIndex, timestamp, it) }
                 .dropWhile { it.isValid().not() }

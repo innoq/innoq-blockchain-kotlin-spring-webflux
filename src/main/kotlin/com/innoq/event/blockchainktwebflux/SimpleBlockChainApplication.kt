@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.time.Clock
 
 @SpringBootApplication
 class SimpleBlockChainApplication
@@ -18,7 +19,7 @@ class SimpleBlockChainApplication
 fun genesisBlock() = Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, "I am Heribert Innoq")), "0")
 
 fun beans() = beans {
-    val chain = BlockChain(genesisBlock())
+    val chain = BlockChain(genesisBlock(), Clock.systemUTC())
     val nodeInfo = NodeInfo(chain)
 
     bean<JacksonBlockModule>()
