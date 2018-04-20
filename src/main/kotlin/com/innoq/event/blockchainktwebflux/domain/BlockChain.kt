@@ -42,9 +42,8 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
     }
 
     fun findTransaction(transactionId: String): Transaction? =
-            blocks.flatMap { it.transactions }
-                    .filter { it.id == transactionId }
-                    .firstOrNull()
+         blocks.flatMap { it.transactions }.firstOrNull { it.id == transactionId }
+                ?: pendingTransactions.firstOrNull { it.id == transactionId }
 
 }
 
