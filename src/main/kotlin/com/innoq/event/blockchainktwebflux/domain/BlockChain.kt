@@ -23,14 +23,24 @@ class BlockChain(genesisBlock: Block, private val clock: Clock) {
         return pendingTransaction
     }
 
+    fun pendingTransactions() : List<Transaction> = pendingTransactions.toList()
+
     private fun computeNextBlock(): Block {
         val nextIndex = lastIndex.incrementAndGet()
         val timestamp = clock.millis()
+        val transactions = selectTransactions(5)
 
         return generateSequence(0L) { it + 1 }
-                .map { blocks.last().newCandidate(nextIndex, timestamp, it) }
+                .map { blocks.last().newCandidate(nextIndex, timestamp, it, transactions) }
                 .dropWhile { it.isValid().not() }
                 .first()
+    }
+
+    private fun selectTransactions(maxNumberOfTransactions: Int): List<Transaction> {
+        val transactions = pendingTransactions.take(maxNumberOfTransactions)
+        pendingTransactions.removeAll(transactions)
+
+        return transactions
     }
 }
 
