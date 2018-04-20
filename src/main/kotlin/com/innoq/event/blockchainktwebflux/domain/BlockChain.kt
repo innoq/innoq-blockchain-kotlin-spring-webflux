@@ -46,8 +46,7 @@ class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPu
     }
 
     private fun selectTransactions(maxNumberOfTransactions: Int): List<Transaction> =
-            generateSequence { pendingTransactions.poll() }
-                    .take(maxNumberOfTransactions)
+            1.rangeTo(maxNumberOfTransactions).map { pendingTransactions.poll() }
                     .filter { it != null }.toList()
 
     /**
