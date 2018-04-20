@@ -48,7 +48,7 @@ class MinerTests {
     }
 
     @Test
-    fun nextBlock_blockChainWithGenesisBlockAndMoreThanFivePendingTransactions_returnsNextBlockWithFivePendingTransactions() {
+    fun nextBlock_blockChainWithGenesisBlockAndMoreThanFivePendingTransactions_returnsFirstNextBlockWithFivePendingTransactionsAndSecondNextBlockWithRemainingPendingtransactions() {
         // arrange
         val blockChain = BlockChain(listOf(genesisBlock()), fixedClock(1234))
 
@@ -57,14 +57,21 @@ class MinerTests {
         }
 
         // act
-        val nextBlock = blockChain.mine().block()
+        val firstNextBlock = blockChain.mine().block()
+        val secondNextBlock = blockChain.mine().block()
 
         // assert
-        assertEquals("Next block doesn't contain all pending transactions", nextBlock!!.transactions.size, 5)
-        assertEquals("Incorrect number of pending transactions after mining next block", blockChain.pendingTransactions().size, 1)
-        assertEquals("Pending transaction is not last one added", blockChain.pendingTransactions().first().payload, Payload("new transaction 6"))
+        assertEquals("First next block doesn't contain expected number of transactions", firstNextBlock!!.transactions.size, 5)
+        assertEquals("First next block doesn't contain expected transactions", Payload("new transaction 5"), transactionPayloadIn(firstNextBlock, 4))
+
+        assertEquals("Second next block doesn't contain expected number of transactions", secondNextBlock!!.transactions.size, 1)
+        assertEquals("Second next block doesn't contain expected transactions", Payload("new transaction 6"), transactionPayloadIn(secondNextBlock, 0))
     }
 
     private fun fixedClock(now: Long) = Clock.fixed(Instant.ofEpochMilli(now), ZoneId.of("UTC"))
+
+    private fun transactionPayloadIn(block: Block, index: Int): Payload {
+        return block.transactions.get(index).payload
+    }
 
 }

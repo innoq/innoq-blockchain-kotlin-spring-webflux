@@ -23,8 +23,6 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
         return pendingTransaction
     }
 
-    fun pendingTransactions() : List<Transaction> = pendingTransactions.toList()
-
     private fun computeNextBlock(): Block {
         val nextIndex = lastIndex.incrementAndGet()
         val timestamp = clock.millis()
