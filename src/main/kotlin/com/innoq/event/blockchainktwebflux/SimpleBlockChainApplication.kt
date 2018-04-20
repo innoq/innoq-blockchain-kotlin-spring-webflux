@@ -11,8 +11,8 @@ import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.reactive.function.server.router
+import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import java.net.URI
 import java.time.Clock
 
 @SpringBootApplication
@@ -37,13 +37,20 @@ fun beans() = beans {
                 ok().contentType(MediaType.APPLICATION_STREAM_JSON)
                         .body(chain.mine())
             })
-            GET("/transaction/{id}", {
-                val transaction = chain.findTransaction(it.pathVariable("id"))
-                if (transaction != null) ok().body(Mono.just(transaction)) else notFound().build()
+            POST("/transactions", { request ->
+                request.bodyToMono<Payload>()
+                        .flatMap { chain.queue(it) }
+                        .flatMap {
+                            created(UriComponentsBuilder
+                                    .fromUriString("/transactions/{id}")
+                                    .buildAndExpand(mapOf("id" to it.id)).encode().toUri())
+                                    .body(Mono.just(it))
+                        }
             })
-            POST("/transactions", {request ->
-                created(URI("/transactions/id"))
-                        .body(request.bodyToMono<Payload>().map { chain.queue(it) })
+            GET("/transactions/{id}", {
+                chain.findTransaction(it.pathVariable("id"))
+                        .flatMap { ok().body(Mono.just(it)) }
+                        .switchIfEmpty(notFound().build())
             })
         }
     }

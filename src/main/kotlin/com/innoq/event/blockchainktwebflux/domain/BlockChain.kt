@@ -17,10 +17,10 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
     fun mine() =
             Mono.just(computeNextBlock()).doOnNext { blocks.add(it) }
 
-    fun queue(payload: Payload): Transaction {
+    fun queue(payload: Payload) = Mono.fromSupplier {
         val pendingTransaction = Transaction(UUID.randomUUID().toString(), clock.millis(), payload)
         pendingTransactions.add(pendingTransaction)
-        return pendingTransaction
+        pendingTransaction
     }
 
     private fun computeNextBlock(): Block {
@@ -41,10 +41,7 @@ class BlockChain(initialBlocks: List<Block>, private val clock: Clock) {
         return transactions
     }
 
-    fun findTransaction(transactionId: String): Transaction? =
-            blocks.flatMap { it.transactions }
-                    .filter { it.id == transactionId }
-                    .firstOrNull()
-
+    fun findTransaction(transactionId: String): Mono<Transaction> =
+            Mono.justOrEmpty(blocks.flatMap { it.transactions }.firstOrNull { it.id == transactionId })
 }
 

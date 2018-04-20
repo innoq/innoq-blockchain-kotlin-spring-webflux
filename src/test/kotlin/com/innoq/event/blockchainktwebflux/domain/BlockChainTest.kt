@@ -31,7 +31,7 @@ class BlockChainTest {
         val blockChain = BlockChain(listOf(block1, block2), clock)
 
         // when
-        val returnedTransaction = blockChain.findTransaction(transactionId)
+        val returnedTransaction = blockChain.findTransaction(transactionId).block()
 
         // then
         assertEquals(transaction2, returnedTransaction)
