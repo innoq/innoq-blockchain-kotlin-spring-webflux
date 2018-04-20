@@ -41,8 +41,8 @@ fun beans() = beans {
                 request.bodyToMono<Payload>()
                         .flatMap { chain.queue(it) }
                         .flatMap {
-                            created(UriComponentsBuilder
-                                    .fromUriString("/transactions/{id}")
+                            created(UriComponentsBuilder.fromUri(request.uri())
+                                    .pathSegment("{id}")
                                     .buildAndExpand(mapOf("id" to it.id)).encode().toUri())
                                     .body(Mono.just(it))
                         }
