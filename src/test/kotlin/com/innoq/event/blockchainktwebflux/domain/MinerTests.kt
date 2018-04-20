@@ -20,7 +20,7 @@ class MinerTests {
         assertEquals(Block(
                 index = 2,
                 timestamp = 1234,
-                proof = 4539,
+                proof = 60229,
                 transactions = emptyList(),
                 previousBlockHash = genesisBlock().hash()
         ), nextBlock)
