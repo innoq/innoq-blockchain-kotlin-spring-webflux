@@ -2,7 +2,9 @@ package com.innoq.event.blockchainktwebflux
 
 import com.innoq.event.blockchainktwebflux.domain.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.boot.runApplication
+import org.springframework.context.ApplicationContextInitializer
+import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 import org.springframework.web.reactive.function.server.router
 
@@ -45,9 +47,12 @@ fun beans() = beans {
 
 }
 
+class BeansInitializer : ApplicationContextInitializer<GenericApplicationContext> {
+    override fun initialize(context: GenericApplicationContext) =
+        beans().initialize(context)
+
+}
+
 fun main(args: Array<String>) {
-    SpringApplicationBuilder()
-            .sources(BlockchainKtWebfluxApplication::class.java)
-            .initializers(beans())
-            .run(*args)
+    runApplication<BlockchainKtWebfluxApplication>(*args)
 }
