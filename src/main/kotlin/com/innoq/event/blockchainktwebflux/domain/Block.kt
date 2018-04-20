@@ -15,11 +15,6 @@ data class Block(val index: Long, val timestamp: Long, val proof: Long, val tran
             .let { encode(it) }
 
     /**
-     * A block is valid if its hash starts with n-zeros
-     */
-    fun isValid() = hash().startsWith("0000")
-
-    /**
      * Creates a new candidate from this block with based on a new timestampe and
      * proposed proposedProof.
      */

@@ -7,7 +7,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.util.stream.IntStream.rangeClosed
 import kotlin.test.junit.JUnitAsserter.assertEquals
-import kotlin.test.junit.JUnitAsserter.assertTrue
 
 class MinerTests {
 
@@ -28,7 +27,6 @@ class MinerTests {
                 transactions = emptyList(),
                 previousBlockHash = genesisBlock().hash()
         ), nextBlock)
-        assertTrue("Next block is not valid", nextBlock!!.isValid())
     }
 
     @Test

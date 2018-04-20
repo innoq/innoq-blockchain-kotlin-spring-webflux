@@ -2,6 +2,7 @@ package com.innoq.event.blockchainktwebflux
 
 import com.innoq.event.blockchainktwebflux.domain.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
@@ -18,18 +19,25 @@ import java.time.Clock
 @SpringBootApplication
 class SimpleBlockChainApplication
 
+class ChainConfiguration(var validBlockPrefix: String = "0000")
+
 fun genesisBlock() = Block(1, 0, 1917336, listOf(Transaction("b3c973e2-db05-4eb5-9668-3e81c7389a6d", 0, Payload("I am Heribert Innoq"))), "0")
 
 fun beans() = beans {
     val eventPublisher = EventPublisher()
-    val chain = BlockChain(listOf(genesisBlock()), eventPublisher, Clock.systemUTC())
-    val nodeInfo = NodeInfo(chain)
+    bean {
+        val chainConfiguration = Binder.get(ref())
+                .bind("chain", ChainConfiguration::class.java).get()
+        BlockChain(listOf(genesisBlock()), eventPublisher, Clock.systemUTC(), chainConfiguration.validBlockPrefix)
+    }
+    bean<NodeInfo>()
 
     bean<JacksonBlockModule>()
     bean {
         router {
+            val chain = ref<BlockChain>()
             GET("/", {
-                ok().body(Mono.just(nodeInfo))
+                ok().body(Mono.just(ref<NodeInfo>()))
             })
             GET("/blocks", {
                 ok().body(Mono.just(chain))

@@ -5,7 +5,7 @@ import java.time.Clock
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
-class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPublisher, private val clock: Clock) {
+class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPublisher, private val clock: Clock, private val validBlockPrefix: String = "0000") {
 
     private val blocks = mutableListOf(*initialBlocks.toTypedArray())
     private val lastIndex = AtomicLong(initialBlocks.last().index)
@@ -35,7 +35,7 @@ class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPu
 
         return generateSequence(0L) { it + 1 }
                 .map { blocks.last().newCandidate(nextIndex, timestamp, it, transactions) }
-                .dropWhile { it.isValid().not() }
+                .dropWhile { isValid(it).not() }
                 .first()
     }
 
@@ -45,4 +45,9 @@ class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPu
 
         return transactions
     }
+
+    /**
+     * A block is valid if its hash starts with n-zeros
+     */
+    private fun isValid(block: Block) = block.hash().startsWith(validBlockPrefix)
 }
