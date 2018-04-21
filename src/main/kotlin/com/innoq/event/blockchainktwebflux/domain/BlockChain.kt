@@ -14,7 +14,7 @@ class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPu
 
     private val blocks = mutableListOf(*initialBlocks.toTypedArray())
     private val lastIndex = AtomicLong(initialBlocks.last().index)
-    private val pendingTransactions : Queue<Transaction> = LinkedBlockingDeque()
+    private val pendingTransactions: Queue<Transaction> = LinkedBlockingDeque()
 
     val blockHeight: Int
         get() = this.blocks.size
@@ -33,24 +33,24 @@ class BlockChain(initialBlocks: List<Block>, private val eventPublisher: EventPu
                     ?: pendingTransactions.firstOrNull { it.id == transactionId })
 
     private fun computeNextBlock(): Mono<Block> {
-        val nextIndex = lastIndex.incrementAndGet()
-        val timestamp = clock.millis()
-        val transactions = selectTransactions(5)
+        val template = blocks.last().copy(
+                index = lastIndex.incrementAndGet(),
+                timestamp = clock.millis(),
+                transactions = selectTransactions(5))
 
+        // @formatter:off
         return Flux.fromStream(Stream.iterate(0L, Long::inc))
-                .parallel()
-                .runOn(Schedulers.parallel())
-                .map { blocks.last().newCandidate(nextIndex, timestamp, it, transactions) }
-                .filter{ isValid(it) }
-                .toMono()
+                .parallel().runOn(Schedulers.parallel())
+                    .map { template.copy(proof = it) }
+                    .filter{ it.hash().startsWith(validBlockPrefix) }
+                .sequential()
+                .next()
+        // @formatter:on
     }
 
     private fun selectTransactions(maxNumberOfTransactions: Int): List<Transaction> =
             1.rangeTo(maxNumberOfTransactions).map { pendingTransactions.poll() }
                     .filter { it != null }.toList()
 
-    /**
-     * A block is valid if its hash starts with n-zeros
-     */
-    private fun isValid(block: Block) = block.hash().startsWith(validBlockPrefix)
+
 }
